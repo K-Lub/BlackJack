@@ -49,15 +49,6 @@ public class Deck {
 			}
 		}
 	}
-	public int cardsLeft(){
-		return deck.length-top;
-	}
-	//For testing deck.
-	private void printDeck(){
-		for(Card i:deck){
-			System.out.println(i.toString());
-		}	
-	}
 	/**
 	 * Shuffles the cards in the deck and resets top of deck.
 	 * 
@@ -79,7 +70,6 @@ public class Deck {
 					}
 				}
 			}
-			
 			//swap cards
 			Card holder = deck[i];
 			deck[i] = deck[newPostition];
@@ -97,31 +87,4 @@ public class Deck {
 		}
 		return deck[top++];
 	}
-	/**
-	 * Returns the number of decks currently being used.
-	 * @return int decks
-	 */
-	public int getDecks(){
-		return deck.length/52;
-	}
-	//for testing deck.
-	/*public static void main(String[] args) {
-    	Deck deck = Deck.getInstance();
-    	for(int i = 0; i<55;i++){
-    		//System.out.println(deck.dealCard().toString());
-    		}
-    	deck.shuffle();
-    	deck.addDeck();
-    	deck.addDeck();
-    	//deck.printDeck();
-    	System.out.println(deck.getDecks());
-    	Deck deck2 = Deck.getInstance();
-    	deck2.printDeck();
-    	System.out.println(deck2.getDecks());
-    	deck2.addDeck();
-    	System.out.println(deck.getDecks());
-    	if(deck == deck2){
-    		System.out.println("They are the same!");
-    	}
-	}*/
 }

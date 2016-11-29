@@ -18,7 +18,8 @@ public class Player {
 	private int top;
 	private int splitTop;
 	private int chips;
-	private int bet;
+	private int nextBet;
+	private int betOnTable;
 	private int maxChips;
 	private int roundsPlayed;
 	private static int players = 0;
@@ -38,13 +39,13 @@ public class Player {
 		if(players == 0){
 			this.name = DEALER;
 			this.chips = 0;
-			this.bet = 0;
+			this.nextBet = 0;
 			this.npc = true;
 		}
 		else{
 			this.name = "Player " + players;
 			this.chips = 5000;
-			this.bet = 200;
+			this.nextBet = 200;
 			this.npc = false;
 		}
 		players++;
@@ -59,6 +60,7 @@ public class Player {
 		this.roundsPlayed = 0;
 		this.maxChips = this.chips;
 		this.doubleDown = false;
+		this.betOnTable = 0;
 	}
 	/**
 	 * Creates a player. If it is the first player, it creates the dealer.
@@ -69,7 +71,7 @@ public class Player {
 		if(players == 0){
 			this.name = DEALER;
 			this.chips = 0;
-			this.bet = 0;
+			this.nextBet = 0;
 			this.npc = true;
 		}
 		else{
@@ -77,7 +79,7 @@ public class Player {
 				this.name = "Player " + players;
 			this.name = name;
 			this.chips = 5000;
-			this.bet = 200;
+			this.nextBet = 200;
 			this.npc = npc;
 		}
 		players++;
@@ -93,6 +95,7 @@ public class Player {
 		this.roundsPlayed = 0;
 		this.maxChips = this.chips;
 		this.doubleDown = false;
+		this.betOnTable = 0;
 	}
 	/**
 	 * Creates a player. If it is the first player, it creates the dealer.
@@ -103,7 +106,7 @@ public class Player {
 		if(players == 0){
 			this.name = DEALER;
 			this.chips = 0;
-			this.bet = 0;
+			this.nextBet = 0;
 			this.npc = true;
 		}
 		else{
@@ -111,7 +114,7 @@ public class Player {
 				this.name = "Player " + players;
 			this.name = name;
 			this.chips = startingChips;
-			this.bet = 200;
+			this.nextBet = 200;
 			this.npc = npc;
 		}
 		players++;
@@ -127,6 +130,7 @@ public class Player {
 		this.roundsPlayed = 0;
 		this.maxChips = this.chips;
 		this.doubleDown = false;
+		this.betOnTable = 0;
 	}
 	/**
 	 * Return name of player.
@@ -170,7 +174,7 @@ public class Player {
 	 * @param bet by player
 	 */
 	public void setBet(int bet){
-		this.bet = bet;
+		this.nextBet = bet;
 	}
 	
 	/**
@@ -200,21 +204,29 @@ public class Player {
 	 * @param bet by player
 	 */
 	public void decreaseBet(int bet){
-		this.bet -= bet;
+		this.nextBet -= bet;
+		this.betOnTable = this.nextBet;
 	}
 	/**
 	 * Changes the amount bet by player.
 	 * @param bet by player
 	 */
 	public void increaseBet(int bet){
-		this.bet += bet;
+		this.nextBet += bet;
+		this.betOnTable = this.nextBet;
+	}
+	public void setBetOnTable(int bet){
+		this.betOnTable = bet;
+	}
+	public int getBetOnTable(){
+		return this.betOnTable;
 	}
 	/**
 	 * Returns the current bet of this player.
 	 * @return bet of this player
 	 */
 	public int getBet(){
-		return this.bet;
+		return this.nextBet;
 	}
 	public boolean firstHandShowing(){
 		return firstHandShowing;
@@ -241,7 +253,7 @@ public class Player {
 	
 	public boolean canDouble(){
 		//Must have two cards and enough to bet
-		if(top==2 && this.chips-this.getBet()>=0 && this.getBet() > 0 && this.name != DEALER && !this.hasStayed && !doubleDown)
+		if(top==2 && this.chips-this.getBetOnTable()>=0 && this.getBetOnTable() > 0 && this.name != DEALER && !this.hasStayed && !doubleDown)
 			return true;
 		return false;
 	}
@@ -260,6 +272,7 @@ public class Player {
 		// Having a Singleton deck class just came in handy.
 		this.receiveCard(Deck.getInstance().dealCard());
 		this.receiveSplitHandCard(Deck.getInstance().dealCard());
+		this.setBetOnTable((this.getBetOnTable()*2));
 	}
 	/**
 	 * Return true if the current hand is Blackjack.
@@ -301,7 +314,7 @@ public class Player {
 		if(top > 2)
 			this.firstHandShowing = false;
 		if(card.face == Card.Face.ACE){
-			aces = true;
+			this.aces = true;
 		}
 	}
 	/**
@@ -329,6 +342,8 @@ public class Player {
 	 */
 	public String getHand(){
 		StringBuilder s = new StringBuilder("");
+		// next line for testing. Displays the hand value. (Dealer value is always shown too)
+		//s.append(getHandValue() + " ");
 		for(int i = 0; i < top; i++){
 			if(this.name.equals(DEALER)&& i==1 &&firstHandShowing){
 				s.append("?? ");
@@ -355,7 +370,7 @@ public class Player {
 		for(int j = 0; j < top; j++){
 			i += hand[j].getValue();
 		}
-		if(aces && i + 10 <= 21){
+		if(this.aces && i + 10 <= 21){
 			i += 10;
 		}
 		return i;
